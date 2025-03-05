@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FulbitolibreTV - En Vivo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1249/1249708.png" type="image/png">
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://app.tudeporteapp.xyz/hora.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #808080; /* Fondo gris */
+      color: #ffffff; /* Blanco */
+      min-height: 100vh;
+      padding: 20px;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 10px 0;
+      background: #0099FF; /* Azul especificado */
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      background: #0099FF;
+      margin: 10px auto;
+      border-radius: 20px;
+      max-width: 500px;
+    }
+    .search-bar input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #000000; /* Negro */
+      font-size: 1rem;
+      outline: none;
+    }
+    .search-bar i {
+      color: #000000; /* Negro */
+      cursor: pointer; /* Indica que el ícono es clickable */
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      color: #0099FF; /* Azul especificado */
+    }
+    .player-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 10px;
+    }
+    #player {
+      width: 100%;
+      height: 40vh;
+      border: 2px solid #0099FF; /* Azul especificado */
+      border-radius: 5px;
+      overflow: hidden;
+      position: sticky;
+      top: 70px;
+      z-index: 50;
+      background: #000000; /* Negro */
+    }
+    .watermark {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      z-index: 60;
+      pointer-events: none;
+    }
+    #channel-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 10px;
+      background: rgba(0, 153, 255, 0.8);
+      border-radius: 5px;
+      margin-bottom: 5px;
+      text-align: center;
+      color: #000000; /* Negro */
+    }
+    #clock {
+      font-size: 1rem;
+      padding: 5px;
+      background: rgba(0, 153, 255, 0.8);
+      border-radius: 5px;
+      text-align: center;
+      color: #000000; /* Negro */
+      margin: 0 auto 20px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .agenda-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 20px;
+      background: #1b1b1b; /* Fondo oscuro de la agenda */
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.73);
+    }
+    .agenda-header {
+      text-align: center;
+      padding: 10px;
+      background: #1b1b1b;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .menu {
+      width: 100%;
+      -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .73), 0 0 18px 0 rgba(0, 0, 0, .1);
+      -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .73), 0 0 18px 0 rgba(0, 0, 0, .1);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .73), 0 0 18px 0 rgba(0, 0, 0, .1);
+    }
+    .menu > li > a {
+      background: linear-gradient(to bottom, rgb(27, 27, 27), rgb(27, 27, 27));
+      border-bottom: 0 solid #33373d;
+      box-shadow: inset 0 1px 0 0 #ffffff;
+      width: 100%;
+      height: 3em;
+      line-height: 3em;
+      text-indent: 7.9em;
+      display: block;
+      position: relative;
+      font-family: arial, Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 1em;
+      text-shadow: 0 0 0 #000;
+      cursor: pointer;
+    }
+    .menu ul li a {
+      background: #1b1b1b;
+      border-bottom: 1px solid #ffffff;
+      width: 100%;
+      height: 3em;
+      line-height: 3em;
+      text-indent: 3.75em;
+      display: block;
+      position: relative;
+      font-family: arial, Arial, Helvetica, sans-serif;
+      font-size: 1.0em;
+      font-weight: 500;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .menu ul li:last-child a {
+      border-bottom: 1px solid #33373d;
+    }
+    .menu > li > a:hover, .menu > li > a.active {
+      background: linear-gradient(to bottom, rgb(50, 50, 50), rgb(50, 50, 50));
+      border-bottom: 1px solid #404040;
+      box-shadow: inset 0 1px 0 0 #404040;
+    }
+    .menu > li > a.active {
+      border-bottom: 0 solid #404040;
+    }
+    .menu > li > a:before {
+      content: '';
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+      height: 1em;
+      width: 1em;
+      position: absolute;
+      left: 70px;
+      top: 50%;
+      margin: -0.5em 0 0;
+    }
+    .menu > li > a span {
+      font-size: .95em;
+      display: inline-block;
+      position: absolute;
+      left: .3em;
+      top: 65%;
+      background: #fff;
+      line-height: 1em;
+      height: 1em;
+      padding: .3em .6em;
+      margin: -.8em 0 0;
+      color: #222d36;
+      text-indent: 0;
+      text-align: center;
+      border-radius: .569em;
+      box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, .16), 0 1px 0 0 rgba(63, 68, 74, .1);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, .5);
+      font-weight: 500;
+    }
+    .menu > li > a:hover span, .menu > li a.active span {
+      background: #404040;
+    }
+    .menu > li > ul li a:before {
+      content: '►';
+      font-size: 9px;
+      position: absolute;
+      width: 1em;
+      height: 1em;
+      top: 0;
+      left: -2.7em;
+    }
+    .menu > li > ul li:hover a, .menu > li > ul li:hover a span, .menu > li > ul li:hover a:before {
+      color: #ff0000;
+    }
+    .menu ul > li > a span {
+      font-size: .857em;
+      display: inline-block;
+      position: absolute;
+      right: 1em;
+      top: 50%;
+      background: #fff;
+      border: 1px solid #1b1b1b;
+      line-height: 1em;
+      height: 1em;
+      padding: 0.4em 0.7em;
+      margin: -0.9em 0 0;
+      color: #000;
+      text-indent: 0;
+      text-align: center;
+      border-radius: .769em;
+      text-shadow: 0 0 0 rgba(255, 255, 255, .01);
+    }
+    .ENG > a:before { background-image: url(https://tr.dpstream1.my/red/en.png); }
+    .ES > a:before { background-image: url(https://tr.dpstream1.my/red/es.png); }
+    .POR > a:before { background-image: url(https://tr.dpstream1.my/red/pt.png); }
+    .HOL > a:before { background-image: url(https://tr.dpstream1.my/red/nl.png); }
+    .FRA > a:before { background-image: url(https://tr.dpstream1.my/red/fr.png); }
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      padding: 15px 10px;
+      background: #0099FF;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 110px;
+      z-index: 40;
+      border-radius: 10px;
+    }
+    .category-btn {
+      background: #0099FF;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      text-align: center;
+      color: #000000;
+    }
+    .category-btn.active, .category-btn:hover {
+      background: #0066CC;
+      transform: scale(1.05);
+    }
+    .category-btn i {
+      margin-right: 5px;
+      color: #000000;
+    }
+    .channels {
+      padding: 15px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(70px, 1fr));
+      gap: 10px;
+      overflow-y: auto;
+    }
+    .channel-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0099FF;
+      padding: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      height: 100px;
+      transition: transform 0.3s, background 0.3s;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .channel-item:hover {
+      transform: scale(1.05);
+      background: #0066CC;
+    }
+    .channel-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 5px;
+    }
+    .channel-name {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      padding: 0 2px;
+      color: #000000;
+    }
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #0099FF;
+      padding: 15px 0;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      z-index: 100;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .footer-bar a {
+      color: #000000;
+      font-size: 2rem;
+      text-decoration: none;
+      transition: color 0.3s, transform 0.2s;
+    }
+    .footer-bar a:hover {
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      #player { height: 30vh; top: 60px; }
+      .categories { grid-template-columns: repeat(2, 1fr); gap: 5px; top: 90px; }
+      .channels { grid-template-columns: repeat(2, minmax(60px, 1fr)); }
+      .channel-item { height: 80px; padding: 2px; }
+      .channel-logo { width: 40px; height: 40px; }
+      .channel-name { font-size: 0.7rem; }
+      .footer-bar { gap: 25px; padding: 10px 0; }
+      .footer-bar a { font-size: 1.5rem; }
+    }
+    .channel-item.deportes { display: block; }
+    .channel-item.tv, .channel-item.247, .channel-item.infantil, .channel-item.mundo { display: none; }
+  </style>
+</head>
+<body onload="guardaHorario();dT();">
+  <h1>FulbitolibreTV - En Vivo</h1>
+  <div class="header">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Buscar canal...">
+      <a href="https://wa.me/1234567890" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    </div>
+  </div>
+  <div class="player-container">
+    <div id="player"></div>
+    <div class="watermark">FulbitolibreTV</div>
+  </div>
+  <div id="channel-name">Selecciona un canal para comenzar</div>
+  <div id="clock"></div>
+
+  <!-- Agenda Deportiva (5 eventos de ejemplo con .m3u8) -->
+  <div class="agenda-container">
+    <div class="agenda-header">
+      <font size="2" face="Helvetica Neue, Helvetica, Arial, sans-serif" color="#FFFFFF">
+        <b>Agenda deportiva del día Domingo 2 de marzo de 2025</b>
+      </font>
+    </div>
+    <ul class="menu">
+      <li class="ENG"><a href="#">FA Cup: Newcastle United vs Brighton<span class="t">14:45</span></a>
+        <ul>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://ultrapremium.cloud:8080/live/38papu59ma66te82/29wuma93weme45/524.m3u8', 'ESPN')">ESPN<span>Calidad 720p</span></a></li>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://ultrapremium.cloud:8080/live/38papu59ma66te82/29wuma93weme45/519.m3u8', 'ESPN OPC.2')">ESPN OPC.2<span>Calidad 720p</span></a></li>
+        </ul>
+      </li>
+      <li class="ES"><a href="#">LaLiga: Barcelona vs Real Sociedad<span class="t">16:15</span></a>
+        <ul>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/espn-deportes.m3u8', 'ESPN Deportes')">ESPN Deportes<span>Calidad 720p</span></a></li>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/espn-4-br.m3u8', 'ESPN 4 BR')">ESPN 4 BR<span>Calidad 720p</span></a></li>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/espn-2-ar.m3u8', 'ESPN 2 AR')">ESPN 2 AR<span>Calidad 720p</span></a></li>
+        </ul>
+      </li>
+      <li class="POR"><a href="#">Primeira Liga: Boavista vs Santa Clara<span class="t">16:30</span></a>
+        <ul>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/goltv.m3u8', 'GolTV')">GolTV<span>Calidad 720p</span></a></li>
+        </ul>
+      </li>
+      <li class="HOL"><a href="#">Eredivisie: Sparta Rotterdam vs Willem II<span class="t">16:45</span></a>
+        <ul>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/espn-2-mx.m3u8', 'ESPN 2 MX')">ESPN 2 MX<span>Calidad 720p</span></a></li>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/espn-2-nl.m3u8', 'ESPN 2 NL')">ESPN 2 NL<span>Calidad 720p</span></a></li>
+        </ul>
+      </li>
+      <li class="FRA"><a href="#">Ligue 1: Angers SCO vs Toulouse<span class="t">17:15</span></a>
+        <ul>
+          <li class="subitem1"><a onclick="changeChannelFromAgenda('http://example.com/cplus-live10.m3u8', 'C+Live 10')">C+Live 10<span>Calidad 720p</span></a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="categories">
+    <div class="category-btn active" data-category="deportes"><i class="fas fa-futbol"></i> Deportes</div>
+    <div class="category-btn" data-category="tv"><i class="fas fa-tv"></i> TV</div>
+    <div class="category-btn" data-category="247"><i class="fas fa-clock"></i> 24/7</div>
+    <div class="category-btn" data-category="infantil"><i class="fas fa-baby"></i> Infantil</div>
+    <div class="category-btn" data-category="mundo"><i class="fas fa-globe"></i> Mundo</div>
+  </div>
+
+  <div class="channels">
+    <!-- Canales de Deportes (30) -->
+    <div class="channel-item deportes" onclick="changeChannel('http://ultrapremium.cloud:8080/live/38papu59ma66te82/29wuma93weme45/524.m3u8', 'espn', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="https://upload.wikimedia.org/wikipedia/commons/6/60/ESPN_logos.png">
+      <span class="channel-name">Fox Sports AR</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://ultrapremium.cloud:8080/live/38papu59ma66te82/29wuma93weme45/553.m3u8', 'M deportes', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Deportes_por_Movistar_Plus%2B_2023_Logo.svg/640px-Deportes_por_Movistar_Plus%2B_2023_Logo.svg.png">
+      <span class="channel-name">M deportes</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://zonamovie.live:8080/live/Shirley20/Shirley20/565888.m3u8', 'Deportes 3', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 3</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://zonamovie.live:8080/live/Shirley20/Shirley20/565890.m3u8', 'Deportes 4', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 4</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://zonamovie.live:8080/live/Shirley20/Shirley20/974215.m3u8', 'Deportes 5', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 5</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes6.m3u8', 'Deportes 6', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 6</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes7.m3u8', 'Deportes 7', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 7</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes8.m3u8', 'Deportes 8', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 8</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes9.m3u8', 'Deportes 9', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 9</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes10.m3u8', 'Deportes 10', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 10</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes11.m3u8', 'Deportes 11', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 11</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes12.m3u8', 'Deportes 12', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 12</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes13.m3u8', 'Deportes 13', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 13</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes14.m3u8', 'Deportes 14', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 14</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes15.m3u8', 'Deportes 15', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 15</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes16.m3u8', 'Deportes 16', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 16</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes17.m3u8', 'Deportes 17', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 17</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes18.m3u8', 'Deportes 18', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 18</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes19.m3u8', 'Deportes 19', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 19</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes20.m3u8', 'Deportes 20', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 20</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes21.m3u8', 'Deportes 21', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 21</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes22.m3u8', 'Deportes 22', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 22</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes23.m3u8', 'Deportes 23', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 23</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes24.m3u8', 'Deportes 24', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 24</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes25.m3u8', 'Deportes 25', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 25</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes26.m3u8', 'Deportes 26', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 26</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes27.m3u8', 'Deportes 27', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 27</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes28.m3u8', 'Deportes 28', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 28</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes29.m3u8', 'Deportes 29', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 29</span>
+    </div>
+    <div class="channel-item deportes" onclick="changeChannel('http://example.com/deportes30.m3u8', 'Deportes 30', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Deportes 30</span>
+    </div>
+
+    <!-- Canales de TV (34) -->
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv1.m3u8', 'TV 1', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 1</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv2.m3u8', 'TV 2', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 2</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv3.m3u8', 'TV 3', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 3</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv4.m3u8', 'TV 4', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 4</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv5.m3u8', 'TV 5', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 5</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv6.m3u8', 'TV 6', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 6</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv7.m3u8', 'TV 7', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 7</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv8.m3u8', 'TV 8', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 8</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv9.m3u8', 'TV 9', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 9</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv10.m3u8', 'TV 10', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 10</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv11.m3u8', 'TV 11', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 11</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv12.m3u8', 'TV 12', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 12</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv13.m3u8', 'TV 13', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 13</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv14.m3u8', 'TV 14', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 14</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv15.m3u8', 'TV 15', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 15</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv16.m3u8', 'TV 16', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 16</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv17.m3u8', 'TV 17', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 17</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv18.m3u8', 'TV 18', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 18</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv19.m3u8', 'TV 19', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 19</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv20.m3u8', 'TV 20', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 20</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv21.m3u8', 'TV 21', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 21</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv22.m3u8', 'TV 22', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 22</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv23.m3u8', 'TV 23', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 23</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv24.m3u8', 'TV 24', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 24</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv25.m3u8', 'TV 25', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 25</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv26.m3u8', 'TV 26', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 26</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv27.m3u8', 'TV 27', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 27</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv28.m3u8', 'TV 28', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 28</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv29.m3u8', 'TV 29', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 29</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv30.m3u8', 'TV 30', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 30</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv31.m3u8', 'TV 31', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 31</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv32.m3u8', 'TV 32', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 32</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv33.m3u8', 'TV 33', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 33</span>
+    </div>
+    <div class="channel-item tv" onclick="changeChannel('http://example.com/tv34.m3u8', 'TV 34', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">TV 34</span>
+    </div>
+
+    <!-- Canales de 24/7 (15) -->
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-1.m3u8', '24/7 1', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 1</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-2.m3u8', '24/7 2', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 2</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-3.m3u8', '24/7 3', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 3</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-4.m3u8', '24/7 4', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 4</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-5.m3u8', '24/7 5', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 5</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-6.m3u8', '24/7 6', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 6</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-7.m3u8', '24/7 7', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 7</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-8.m3u8', '24/7 8', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 8</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-9.m3u8', '24/7 9', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 9</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-10.m3u8', '24/7 10', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 10</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-11.m3u8', '24/7 11', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 11</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-12.m3u8', '24/7 12', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 12</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-13.m3u8', '24/7 13', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 13</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-14.m3u8', '24/7 14', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 14</span>
+    </div>
+    <div class="channel-item 247" onclick="changeChannel('http://example.com/247-15.m3u8', '24/7 15', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">24/7 15</span>
+    </div>
+
+    <!-- Canales de Infantil (15) -->
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil1.m3u8', 'Infantil 1', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 1</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil2.m3u8', 'Infantil 2', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 2</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil3.m3u8', 'Infantil 3', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 3</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil4.m3u8', 'Infantil 4', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 4</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil5.m3u8', 'Infantil 5', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 5</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil6.m3u8', 'Infantil 6', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 6</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil7.m3u8', 'Infantil 7', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 7</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil8.m3u8', 'Infantil 8', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 8</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil9.m3u8', 'Infantil 9', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 9</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil10.m3u8', 'Infantil 10', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 10</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil11.m3u8', 'Infantil 11', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 11</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil12.m3u8', 'Infantil 12', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 12</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil13.m3u8', 'Infantil 13', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 13</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil14.m3u8', 'Infantil 14', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 14</span>
+    </div>
+    <div class="channel-item infantil" onclick="changeChannel('http://example.com/infantil15.m3u8', 'Infantil 15', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Infantil 15</span>
+    </div>
+
+    <!-- Canales de Mundo (39) -->
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo1.m3u8', 'Mundo 1', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 1</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo2.m3u8', 'Mundo 2', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 2</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo3.m3u8', 'Mundo 3', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 3</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo4.m3u8', 'Mundo 4', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 4</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo5.m3u8', 'Mundo 5', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 5</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo6.m3u8', 'Mundo 6', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 6</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo7.m3u8', 'Mundo 7', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 7</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo8.m3u8', 'Mundo 8', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 8</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo9.m3u8', 'Mundo 9', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 9</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo10.m3u8', 'Mundo 10', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 10</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo11.m3u8', 'Mundo 11', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 11</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo12.m3u8', 'Mundo 12', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 12</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo13.m3u8', 'Mundo 13', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 13</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo14.m3u8', 'Mundo 14', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 14</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo15.m3u8', 'Mundo 15', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 15</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo16.m3u8', 'Mundo 16', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 16</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo17.m3u8', 'Mundo 17', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 17</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo18.m3u8', 'Mundo 18', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 18</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo19.m3u8', 'Mundo 19', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 19</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo20.m3u8', 'Mundo 20', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 20</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo21.m3u8', 'Mundo 21', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 21</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo22.m3u8', 'Mundo 22', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 22</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo23.m3u8', 'Mundo 23', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 23</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo24.m3u8', 'Mundo 24', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 24</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo25.m3u8', 'Mundo 25', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 25</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo26.m3u8', 'Mundo 26', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 26</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo27.m3u8', 'Mundo 27', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 27</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo28.m3u8', 'Mundo 28', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 28</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo29.m3u8', 'Mundo 29', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 29</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo30.m3u8', 'Mundo 30', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 30</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo31.m3u8', 'Mundo 31', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 31</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo32.m3u8', 'Mundo 32', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 32</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo33.m3u8', 'Mundo 33', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 33</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo34.m3u8', 'Mundo 34', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 34</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo35.m3u8', 'Mundo 35', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 35</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo36.m3u8', 'Mundo 36', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 36</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo37.m3u8', 'Mundo 37', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 37</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo38.m3u8', 'Mundo 38', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 38</span>
+    </div>
+    <div class="channel-item mundo" onclick="changeChannel('http://example.com/mundo39.m3u8', 'Mundo 39', this)">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="channel-logo">
+      <span class="channel-name">Mundo 39</span>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <a href="https://wa.me/1234567890" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://t.me/tu_usuario" target="_blank" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+    <a href="https://www.tiktok.com/@tu_usuario" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
+    <a href="https://www.instagram.com/tu_usuario" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+  </div>
+
+  <script>
+    var player;
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        categoryBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterChannels(btn.getAttribute('data-category'));
+      });
+    });
+
+    function changeChannel(url, channelName, listItem) {
+      if (player) {
+        player.stop();
+        player.destroy();
+      }
+      player = new Clappr.Player({
+        source: url,
+        parentId: "#player",
+        autoPlay: true,
+        mute: false,
+        width: "100%",
+        height: "100%",
+        playback: { hlsjsConfig: { enableWorker: true } }
+      });
+      document.getElementById("channel-name").innerText = "Reproduciendo: " + channelName;
+    }
+
+    function changeChannelFromAgenda(url, channelName) {
+      event.preventDefault();
+      changeChannel(url, channelName);
+    }
+
+    function filterChannels(category) {
+      const channels = document.querySelectorAll('.channel-item');
+      channels.forEach(channel => {
+        if (channel.classList.contains(category)) {
+          channel.style.display = 'block';
+        } else {
+          channel.style.display = 'none';
+        }
+      });
+    }
+
+    $(function() {
+      var menu_ul = $('.menu > li > ul'),
+            menu_a = $('.menu > li > a');
+      menu_ul.hide();
+      menu_a.click(function(e) {
+        e.preventDefault();
+        if (!$(this).hasClass('active')) {
+          menu_a.removeClass('active');
+          menu_ul.filter(':visible').slideUp('fast');
+          $(this).addClass('active').next().stop(true, true).slideDown('fast');
+        } else {
+          $(this).removeClass('active');
+          $(this).next().stop(true, true).slideUp('fast');
+        }
+      });
+    });
+
+    // Reloj en tiempo real
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      document.getElementById('clock').innerText = `Hora: ${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Funcionalidad del buscador
+    document.getElementById('search-input').addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const channels = document.querySelectorAll('.channel-item');
+      channels.forEach(channel => {
+        const channelName = channel.querySelector('.channel-name').innerText.toLowerCase();
+        if (channelName.includes(searchTerm)) {
+          channel.style.display = 'block';
+        } else {
+          channel.style.display = 'none';
+        }
+      });
+    });
+
+    window.onload = () => {
+      filterChannels('deportes');
+    };
+  </script>
+</body>
+</html>
